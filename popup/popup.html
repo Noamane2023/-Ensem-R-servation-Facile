@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ensem Meal Scheduler</title>
+    <link rel="stylesheet" href="bulma.min.css" />
+    <style>
+      /* Optional: Add a little more spacing and set a width for the popup */
+      body {
+        width: 300px;
+        padding: 1rem;
+      }
+      .palestine-message {
+        text-align: center;
+        margin: 1rem 0 1.5rem 0;
+        font-family: "Cairo", "Amiri", serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        user-select: none;
+      }
+
+      .palestine-message span {
+        background: linear-gradient(90deg, #000000, #ce1126, #007a3d, #000000);
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4em;
+      }
+
+      .pal-flag {
+        width: 50px;
+        height: auto;
+        vertical-align: middle;
+        filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 class="title is-4 has-text-centered" style="color: #c30790">
+        Ensem Réservation Facile
+      </h1>
+      <hr />
+      <div class="palestine-message m-5" lang="ar" dir="rtl">
+        <img
+          src="/icons/palestine.png"
+          alt="Drapeau Palestine"
+          class="pal-flag"
+        />
+
+        <span
+          >لا تنسوا أن المقاطعة سلاح فعّال، فلا تستهينوا بها دعمًا لإخواننا في
+          فلسطين</span
+        >
+      </div>
+
+      <div class="columns is-vcentered is-mobile">
+        <div class="column">
+          <p class="is-size-6 has-text-weight-bold tag">Petit Déjeuner</p>
+        </div>
+
+        <div class="column is-narrow">
+          <div class="buttons has-addons">
+            <a
+              class="button"
+              href="#"
+              id="breakfast"
+              aria-label="Book breakfast"
+            >
+              <span class="icon">
+                <img src="/icons/breakfast.png" alt="Breakfast icon" />
+              </span>
+            </a>
+            <a
+              class="button"
+              href="#"
+              id="cancel-breakfast"
+              aria-label="Cancel breakfast"
+            >
+              <span class="icon">
+                <img src="/icons/franchi.png" alt="Cancel breakfast icon" />
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-vcentered is-mobile">
+        <div class="column">
+          <p class="is-size-6 has-text-weight-bold tag">Déjeuner</p>
+        </div>
+        <div class="column is-narrow">
+          <div class="buttons has-addons">
+            <a
+              class="button"
+              href="#"
+              id="lunch-dine-in"
+              aria-label="Dine-in for lunch"
+            >
+              <span class="icon">
+                <img src="/icons/lunch.png" alt="Dine-in icon" />
+              </span>
+            </a>
+            <a
+              class="button"
+              href="#"
+              id="lunch-take-away"
+              aria-label="Take away lunch"
+            >
+              <span class="icon">
+                <img src="/icons/take-away.png" alt="Take away icon" />
+              </span>
+            </a>
+            <a
+              class="button"
+              href="#"
+              id="cancel-lunch"
+              aria-label="Cancel lunch"
+            >
+              <span class="icon">
+                <img src="/icons/franchi.png" alt="Cancel lunch icon" />
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-vcentered is-mobile">
+        <div class="column">
+          <p class="is-size-6 has-text-weight-bold tag">Dîner</p>
+        </div>
+        <div class="column is-narrow">
+          <div class="buttons has-addons">
+            <a
+              class="button"
+              href="#"
+              id="dinner-dine-in"
+              aria-label="Dine-in for dinner"
+            >
+              <span class="icon">
+                <img src="/icons/lunch.png" alt="Dine-in icon" />
+              </span>
+            </a>
+            <a
+              class="button"
+              href="#"
+              id="dinner-take-away"
+              aria-label="Take away dinner"
+            >
+              <span class="icon">
+                <img src="/icons/take-away.png" alt="Take away icon" />
+              </span>
+            </a>
+            <a
+              class="button"
+              href="#"
+              id="cancel-dinner"
+              aria-label="Cancel dinner"
+            >
+              <span class="icon">
+                <img src="/icons/franchi.png" alt="Cancel dinner icon" />
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-vcentered is-mobile">
+        <div class="column">
+          <p class="is-size-6 has-text-weight-bold tag">Tous les repas</p>
+        </div>
+        <div class="column is-narrow">
+          <div class="buttons has-addons">
+            <a
+              class="button"
+              href="#"
+              id="all-dine-in"
+              aria-label="Dine-in for all meals"
+            >
+              <span class="icon">
+                <img src="/icons/lunch.png" alt="Dine-in icon" />
+              </span>
+            </a>
+            <a
+              class="button"
+              href="#"
+              id="all-take-away"
+              aria-label="Take away for all meals"
+            >
+              <span class="icon">
+                <img src="/icons/take-away.png" alt="Take away icon" />
+              </span>
+            </a>
+            <a class="button" href="#" id="cancel-all" aria-label="Cancel all">
+              <span class="icon">
+                <img src="/icons/franchi.png" alt="Cancel all icon" />
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+  <footer class="footer-credit has-text-centered mt-5">
+    Développé par
+    <a
+      href="https://www.linkedin.com/in/makhlouf-noaman-2499a6313/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span class="has-text-weight-bold" style="color: #c30790"
+        >Noaman Makhlouf</span
+      >
+    </a>
+  </footer>
+  <script src="popup.js"></script>
+</html>
