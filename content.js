@@ -1,128 +1,151 @@
-function sliceObject(obj, startIndex, endIndex) {
-  // Convert obj (like NodeList) to array, then slice
-  const arr = Array.from(obj);
-  const sliced = arr.slice(startIndex, endIndex);
-  return sliced; // returns array of DOM elements
+// Helper function to wait for a specified time (in milliseconds)
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function selectMeal(type, startIndex, endIndex) {
-  const selector = `input[type="radio"][composition="${type}"]`;
-  const inputs = document.querySelectorAll(selector);
+// Delay between clicks in milliseconds (4 seconds)
+const CLICK_DELAY_MS = 4000;
 
-  const slicedInputs = sliceObject(inputs, startIndex, endIndex);
-  console.log("Inputs found:", inputs);
-  console.log("Sliced Inputs:", slicedInputs);
+// Helper function to properly click a Bootstrap radio button by clicking its label
+function triggerClick(input) {
+  const label = document.querySelector(`label[for="${input.id}"]`);
 
-  if (slicedInputs.length > 0) {
-    slicedInputs.forEach((input) => {
-      input.click(); // simulate a click
-      input.checked = true; // mark as selected
-      console.log("✅ Clicked:", input);
-    });
+  if (label) {
+    label.click();
+    console.log("🏷️ Clicked label for:", input.id);
   } else {
-    console.warn("❌ No elements found for:", selector);
-  }
-}
-function cancelMeal(startIndex, endIndex) {
-  const selector = `input[type="radio"][composition="0"]`;
-  const inputs = document.querySelectorAll(selector);
-
-  const slicedInputs = sliceObject(inputs, startIndex, endIndex);
-  console.log("Inputs found:", inputs);
-  console.log("Sliced Inputs:", slicedInputs);
-
-  if (slicedInputs.length > 0) {
-    slicedInputs.forEach((input) => {
-      input.click(); // simulate a click
-      input.checked = true; // mark as selected
-      console.log("✅ Clicked:", input);
-    });
-  } else {
-    console.warn("❌ No elements found for:", selector);
-  }
-}
-function cancelAllMeals() {
-  const selector = `input[type="radio"][composition="0"]`;
-  const inputs = document.querySelectorAll(selector);
-
-  if (inputs.length > 0) {
-    inputs.forEach((input) => {
-      input.click(); // Simulate a click
-      input.checked = true; // Mark as selected
-      console.log("✅ Clicked:", input);
-    });
-  } else {
-    console.warn("❌ No elements found for:", selector);
-  }
-}
-function selectAllMeals(type) {
-  const selector = `input[type="radio"][composition="${type}"]`;
-  const inputs = document.querySelectorAll(selector);
-
-  if (inputs.length > 0) {
-    inputs.forEach((input) => {
-      input.click(); // simulate a click
-      input.checked = true; // mark as selected
-      console.log("✅ Clicked:", input);
-    });
-  } else {
-    console.warn("❌ No elements found for:", selector);
+    input.checked = true;
+    input.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    console.log("🔘 Clicked input directly:", input.id);
   }
 }
 
-chrome.runtime.onMessage.addListener((data) => {
-  if (data.action === "cancel-all") {
-    cancelAllMeals();
-    console.log("Cancelling all meals...");
+// Select all meals with a specific composition type
+// composition: "1" = dine-in, "2" = take-away, "0" = cancel
+async function selectAllByComposition(composition) {
+  const selector = `input.btn-check[composition="${composition}"]`;
+  const inputs = document.querySelectorAll(selector);
+
+  console.log(`🔍 Found ${inputs.length} inputs matching: ${selector}`);
+
+  if (inputs.length === 0) {
+    console.warn("❌ No elements found for:", selector);
     return;
+  }
+
+  for (let i = 0; i < inputs.length; i++) {
+    const input = inputs[i];
+    console.log(`\n📍 Processing (${i + 1}/${inputs.length}): ${input.id}`);
+
+    triggerClick(input);
+
+    // Wait before the next click (except for the last one)
+    if (i < inputs.length - 1) {
+      console.log(`⏳ Waiting ${CLICK_DELAY_MS / 1000} seconds before next click...`);
+      await sleep(CLICK_DELAY_MS);
+    }
+  }
+
+  console.log(`\n✅ All ${inputs.length} selections completed!`);
+}
+
+// Select meals by type AND meal category (breakfast=1, lunch=2, dinner=3)
+async function selectMealsByCategory(composition, repas) {
+  let inputs;
+
+  if (repas) {
+    const allInputs = document.querySelectorAll(`input.btn-check[composition="${composition}"]`);
+    inputs = Array.from(allInputs).filter(input => {
+      const name = input.getAttribute('name') || '';
+      return name.endsWith(`_${repas}`);
+    });
+  } else {
+    inputs = document.querySelectorAll(`input.btn-check[composition="${composition}"]`);
+  }
+
+  console.log(`🔍 Found ${inputs.length} inputs for composition=${composition}, repas=${repas}`);
+
+  if (inputs.length === 0) {
+    console.warn("❌ No elements found");
+    return;
+  }
+
+  for (let i = 0; i < inputs.length; i++) {
+    const input = inputs[i];
+    console.log(`\n📍 Processing (${i + 1}/${inputs.length}): ${input.id}`);
+
+    triggerClick(input);
+
+    // Wait before the next click (except for the last one)
+    if (i < inputs.length - 1) {
+      console.log(`⏳ Waiting ${CLICK_DELAY_MS / 1000} seconds before next click...`);
+      await sleep(CLICK_DELAY_MS);
+    }
+  }
+
+  console.log(`\n✅ All ${inputs.length} selections completed!`);
+}
+
+// Message listener for popup commands
+chrome.runtime.onMessage.addListener((data) => {
+  console.log("📨 Received message:", data);
+
+  if (data.action === "cancel-all") {
+    console.log("🚫 Cancelling all meals...");
+    selectAllByComposition("0");
   } else if (data.action === "all-dine-in") {
-    selectAllMeals("1");
-    console.log("Booking all meals as dine-in...");
+    console.log("🍽️ Booking all meals as dine-in...");
+    selectAllByComposition("1");
   } else if (data.action === "all-take-away") {
-    selectAllMeals("2");
-    console.log("Booking all meals as take-away...");
+    console.log("🥡 Booking all meals as take-away...");
+    selectAllByComposition("2");
   } else if (data.action === "bookBreakfast") {
-    selectMeal(1, 0, 6);
-    console.log("Booking breakfast...");
-    // Add your booking logic here
+    console.log("🌅 Booking breakfast (dine-in)...");
+    selectMealsByCategory("1", "1");
   } else if (data.action === "bookLunch") {
-    console.log(`Booking lunch as ${data.type}...`);
     if (data.type === "dine-in") {
-      selectMeal(1, 6, 13);
+      console.log("🍽️ Booking lunch as dine-in...");
+      selectMealsByCategory("1", "2");
     } else if (data.type === "take-away") {
-      selectMeal(2, 0, 7);
+      console.log("🥡 Booking lunch as take-away...");
+      selectMealsByCategory("2", "2");
     }
   } else if (data.action === "bookDinner") {
-    console.log(`Book0ing dinner as ${data.type}...`);
     if (data.type === "dine-in") {
-      selectMeal(1, 13, 19);
+      console.log("🍽️ Booking dinner as dine-in...");
+      selectMealsByCategory("1", "3");
     } else if (data.type === "take-away") {
-      selectMeal(2, 7, 13);
+      console.log("🥡 Booking dinner as take-away...");
+      selectMealsByCategory("2", "3");
     }
   } else if (data.action === "cancel-breakfast") {
-    cancelMeal(0, 6);
-    console.log("Cancelling breakfast...");
+    console.log("🚫 Cancelling breakfast...");
+    selectMealsByCategory("0", "1");
   } else if (data.action === "cancel-lunch") {
-    console.log(`Cancelling lunch...`);
-    cancelMeal(6, 13);
+    console.log("🚫 Cancelling lunch...");
+    selectMealsByCategory("0", "2");
   } else if (data.action === "cancel-dinner") {
-    console.log(`Cancelling dinner...`);
-    cancelMeal(13, 19);
+    console.log("🚫 Cancelling dinner...");
+    selectMealsByCategory("0", "3");
   }
 });
 
+// Auto-fill username functionality
 const loginButton = document.querySelector('button[name="login"]');
 if (loginButton) {
   loginButton.addEventListener("click", (e) => {
     const username = document.querySelector("#username").value;
     chrome.storage.local.set({ keyName: username }, () => {
-      console.log("Value is saved:", username);
+      console.log("💾 Username saved:", username);
     });
   });
 } else {
-  console.warn("Login button not found");
+  console.warn("⚠️ Login button not found");
 }
 
+// Restore username on page load
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", run);
 } else {
@@ -132,7 +155,12 @@ if (document.readyState === "loading") {
 function run() {
   chrome.storage.local.get("keyName", (data) => {
     const username = data.keyName || "";
-    document.querySelector("#username").value = username;
-    console.log("Value retrieved:", username);
+    const usernameField = document.querySelector("#username");
+    if (usernameField) {
+      usernameField.value = username;
+      console.log("📋 Username restored:", username);
+    }
   });
 }
+
+console.log("✅ Ensem Meal Scheduler extension loaded!");
